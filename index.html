@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Stor Gaming</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Tahoma,Arial;
+  background:linear-gradient(120deg,#000,#111,#000);
+  color:#fff;
+  animation:bg 10s infinite alternate;
+}
+@keyframes bg{
+  from{background-position:0%}
+  to{background-position:100%}
+}
+
+.app{
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:20px;
+}
+.header h1{
+  color:gold;
+  text-shadow:0 0 15px gold;
+}
+.header small{
+  color:#aaa;
+}
+
+.btn{
+  width:100%;
+  padding:15px;
+  margin:10px 0;
+  border:none;
+  border-radius:15px;
+  font-size:16px;
+  font-weight:bold;
+  background:linear-gradient(145deg,#ffd700,#ffb300);
+  color:#000;
+  cursor:pointer;
+}
+.btn:active{transform:scale(.96)}
+
+.section{
+  background:#0e0e0e;
+  padding:15px;
+  border-radius:15px;
+  margin-top:20px;
+  box-shadow:0 0 20px #000 inset;
+}
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:none;
+}
+
+canvas{
+  display:block;
+  margin:10px auto;
+}
+
+.visits{
+  text-align:center;
+  margin-top:15px;
+  color:#0f0;
+}
+
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">
+  <h1>The Stor Gaming</h1>
+  <small>By: njma6797@gmail.com</small>
+</div>
+
+<button class="btn" onclick="sell()">💰 بيع حسابات</button>
+<button class="btn" onclick="buy()">🛒 شراء حسابات</button>
+<button class="btn" onclick="show('wheel')">🎡 عجلة الحظ</button>
+<button class="btn" onclick="show('comment')">💬 تعليق</button>
+<button class="btn" onclick="share()">📤 مشاركة</button>
+
+<div class="visits">
+  👁️ تم دخول <span id="visits">2065646</span> الموقع
+</div>
+
+<!-- عجلة الحظ -->
+<div id="wheel" class="section hidden">
+<h3>🎡 عجلة الحظ</h3>
+
+<input id="name" placeholder="الاسم">
+<input id="pid" placeholder="ID">
+
+<canvas id="c" width="260" height="260"></canvas>
+
+<button class="btn" onclick="spin()">لف العجلة</button>
+</div>
+
+<!-- تعليق -->
+<div id="comment" class="section hidden">
+<h3>💬 اترك تعليقك</h3>
+<textarea placeholder="اكتب تعليق جميل"></textarea>
+<button class="btn" onclick="alert('تم إرسال التعليق ❤️')">إرسال</button>
+</div>
+
+<audio id="win">
+<source src="https://translate.google.com/translate_tts?ie=UTF-8&tl=ar&client=tw-ob&q=الف+مبروك" type="audio/mpeg">
+</audio>
+
+</div>
+
+<script>
+/* ===== أزرار ===== */
+function sell(){
+  location.href="https://wa.me/2001211056530?text=اريد%20بيع%20حساب";
+}
+function buy(){
+  location.href="https://wa.me/2001211056530?text=اريد%20شراء%20حساب";
+}
+function show(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+/* ===== عداد الزيارات ===== */
+let visits = localStorage.getItem("visits")
+  ? parseInt(localStorage.getItem("visits"))
+  : 2065646;
+
+setInterval(()=>{
+  visits += 5;
+  localStorage.setItem("visits",visits);
+  document.getElementById("visits").innerText = visits;
+},1000);
+
+/* ===== عجلة Canvas ===== */
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const prizes = ["❌ لا شيء","❌ لا شيء","660 UC","6600 UC","2000 جنيه"];
+let angle = 0;
+
+function draw(){
+  let slice = 2*Math.PI/prizes.length;
+  prizes.forEach((p,i)=>{
+    ctx.beginPath();
+    ctx.moveTo(130,130);
+    ctx.arc(130,130,120,i*slice,(i+1)*slice);
+    ctx.fillStyle = i%2?"#333":"#ffd700";
+    ctx.fill();
+  });
+}
+draw();
+
+function spin(){
+  const n = document.getElementById("name").value.trim();
+  const id = document.getElementById("pid").value.trim();
+  if(!n || !id){
+    alert("من فضلك ادخل الاسم و ID");
+    return;
+  }
+  angle += 1440 + Math.random()*360;
+  canvas.style.transition="transform 4s ease-out";
+  canvas.style.transform=`rotate(${angle}deg)`;
+
+  setTimeout(()=>{
+    const res = prizes[Math.floor(Math.random()*prizes.length)];
+    if(res !== "❌ لا شيء"){
+      win.play();
+      alert("🎉 مبروك " + res);
+    }else{
+      alert("حظك المرة الجاية أفضل");
+    }
+  },4000);
+}
+
+/* ===== مشاركة ===== */
+function share(){
+  const text="وربنا يا أسطي موقع موووت وحقيقي وانا حظي حلو فيه 🔥";
+  const url=location.href;
+  navigator.share
+    ? navigator.share({text,url})
+    : window.open(`https://wa.me/?text=${encodeURIComponent(text+" "+url)}`);
+}
+</script>
+
+</body>
+</html>
